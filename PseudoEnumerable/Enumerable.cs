@@ -21,7 +21,14 @@ namespace PseudoEnumerable
         public static IEnumerable<TSource> Filter<TSource>(this IEnumerable<TSource> source,
             Func<TSource,bool> predicate)
         {
-            throw new NotImplementedException();
+            CheckForFilterExceptions(source, predicate);
+
+            foreach (var item in source) {
+                if (predicate.Invoke(item))
+                {
+                    yield return item;
+                }
+            }
         }
 
         /// <summary>
@@ -37,10 +44,15 @@ namespace PseudoEnumerable
         /// </returns>
         /// <exception cref="ArgumentNullException">Throws if <paramref name="source"/> is null.</exception>
         /// <exception cref="ArgumentNullException">Throws if <paramref name="transformer"/> is null.</exception>
-        public static IEnumerable<TResult> Transform<TSource, TResult>(this IEnumerable<TSource> source,
+        public static IEnumerable<TResult> Transform <TSource, TResult>(this IEnumerable<TSource> source,
             Func<TSource, TResult> transformer)
         {
-            throw new NotImplementedException();
+            CheckForExceptions(source, transformer);
+
+            foreach (var item in source)
+            {
+                yield return transformer(item);
+            }
         }
 
         /// <summary>
@@ -58,7 +70,19 @@ namespace PseudoEnumerable
         public static IEnumerable<TSource> SortBy<TSource, TKey>(this IEnumerable<TSource> source,
             Func<TSource, TKey> key)
         {
-            throw new NotImplementedException();
+            CheckForExceptions(source, key);
+
+            List<TKey> keys = new List<TKey>();
+            foreach (var item in source)
+            {
+                keys.Add(key(item));
+            }
+
+            List<TSource> sources = new List<TSource>(source);
+            TKey[] arrayKeys = keys.ToArray();
+            TSource[] arraySource = sources.ToArray();
+            Array.Sort(arrayKeys, arraySource);
+            return arraySource;
         }
 
         /// <summary>
@@ -93,7 +117,17 @@ namespace PseudoEnumerable
         /// <exception cref="InvalidCastException">An element in the sequence cannot be cast to type TResult.</exception>
         public static IEnumerable<TResult> CastTo<TResult>(IEnumerable source)
         {
-            throw new NotImplementedException();
+            CheckCastForNull(source);
+
+            foreach (var item in source)
+            {
+                if (!(item is TResult))
+                    throw new InvalidCastException($"invalid cast");
+                else
+                {
+                    yield return (TResult)item;
+                }
+            }
         }
 
         /// <summary>
@@ -110,7 +144,59 @@ namespace PseudoEnumerable
         /// <exception cref="ArgumentNullException">Throws if <paramref name="predicate"/> is null.</exception>
         public static bool ForAll<TSource>(this IEnumerable<TSource> source, Func<TSource, bool> predicate)
         {
-            throw new NotImplementedException();
+            CheckForFilterExceptions(source, predicate);
+
+            bool result = false;
+
+            foreach (var item in source)
+            {
+                if (predicate(item))
+                {
+                    result = true;
+                }
+                else
+                {
+                    result = false;
+                    break;
+                }
+            }
+
+            return result;
+        }
+
+        static private void CheckForExceptions<T1, T2>(IEnumerable<T1> source,
+            Func<T1, T2> transformer)
+        {
+            if (source == null)
+            {
+                throw new ArgumentNullException($"{nameof(source)} can't b null");
+            }
+
+            if (transformer == null)
+            {
+                throw new ArgumentNullException($"{nameof(transformer)} can't b null");
+            }
+        }
+
+        static private void CheckCastForNull(IEnumerable source)
+        {
+            if (source == null)
+            {
+                throw new ArgumentNullException($"{nameof(source)} can't b null");
+            }
+        }
+
+        static private void CheckForFilterExceptions<TSource>(IEnumerable<TSource> source, Func<TSource,bool> predicate)
+        {
+            if (source == null)
+            {
+                throw new ArgumentNullException($"{nameof(source)} can't b null");
+            }
+
+            if (predicate == null)
+            {
+                throw new ArgumentNullException($"{nameof(predicate)} can't b null");
+            }
         }
     }
 }
