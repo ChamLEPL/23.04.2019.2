@@ -4,6 +4,7 @@ using System.Text;
 using System.Threading.Tasks;
 using NUnit.Framework;
 using PseudoEnumerable;
+using PseudoLINQ;
 
 namespace PseudoEnumerable.Tests
 {
@@ -78,5 +79,13 @@ namespace PseudoEnumerable.Tests
             return Enumerable.SortBy<int, int>(array, x => Math.Abs(x));
         }
 
+        [TestCase(new int[] { 4, 7, 8, 9 }, ExpectedResult = new int[] { 4, 8, 7, 9 })]
+        [TestCase(new int[] { -5, -17, -8, -9 }, ExpectedResult = new int[] { -8, -5, -17, -9 })]
+        [TestCase(new int[] { 5, 7, -88, 9 }, ExpectedResult = new int[] { -88, 5, 7, 9 })]
+        public IEnumerable<int> SortBy_SortByEven_returnsSortedSequenceWithComparer(int[] array)
+        {
+            return Enumerable.SortBy<int, bool>(array,  x => x % 2 == 0,
+                new CompareByBoolFirstEven());
+        }
     }
 }

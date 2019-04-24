@@ -72,17 +72,7 @@ namespace PseudoEnumerable
         {
             CheckForExceptions(source, key);
 
-            List<TKey> keys = new List<TKey>();
-            foreach (var item in source)
-            {
-                keys.Add(key(item));
-            }
-
-            List<TSource> sources = new List<TSource>(source);
-            TKey[] arrayKeys = keys.ToArray();
-            TSource[] arraySource = sources.ToArray();
-            Array.Sort(arrayKeys, arraySource);
-            return arraySource;
+            return SortBy(source, key, null);
         }
 
         /// <summary>
@@ -102,7 +92,28 @@ namespace PseudoEnumerable
         public static IEnumerable<TSource> SortBy<TSource, TKey>(this IEnumerable<TSource> source,
             Func<TSource, TKey> key, IComparer<TKey> comparer)
         {
-            throw new NotImplementedException();
+            CheckForExceptions(source, key);
+
+            List<TKey> keys = new List<TKey>();
+            foreach (var item in source)
+            {
+                keys.Add(key(item));
+            }
+
+            List<TSource> sources = new List<TSource>(source);
+            TKey[] arrayKeys = keys.ToArray();
+            TSource[] arraySource = sources.ToArray();
+
+            if (comparer == null)
+            {
+                Array.Sort(arrayKeys, arraySource);
+            }
+            else
+            {
+                Array.Sort(arrayKeys, arraySource, comparer);
+            }
+
+            return arraySource;
         }
 
         /// <summary>
