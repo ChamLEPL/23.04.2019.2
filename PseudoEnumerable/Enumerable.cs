@@ -148,12 +148,14 @@ namespace PseudoEnumerable
         /// </returns>
         /// <exception cref="ArgumentNullException">Throws if <paramref name="source"/> is null.</exception>
         /// <exception cref="ArgumentNullException">Throws if <paramref name="key"/> is null.</exception>
-        //public static IEnumerable<TSource> SortByDescending<TSource, TKey>(this IEnumerable<TSource> source,
-        //    Func<TSource, TKey> key)
-        //{
-        //    CheckForExceptions(source, key);
-        //   // return SortBy<TSource,TKey>(source, key, new SortByDescending());
-        //}
+        public static IEnumerable<TSource> SortByDescending<TSource, TKey>(this IEnumerable<TSource> source,
+            Func<TSource, TKey> key)
+        {
+            CheckForExceptions(source, key);
+            List <TSource> resultSequence = new List<TSource>(SortBy<TSource, TKey>(source, key));
+            resultSequence.Reverse();
+            return resultSequence;
+        }
 
         /// <summary>
         /// Casts the elements of an IEnumerable to the specified type.

@@ -96,5 +96,13 @@ namespace PseudoEnumerable.Tests
             return Enumerable.SortBy<int, int, string>(array, x => Math.Abs(x), 
                  x => (-x).ToString());
         }
+
+        [TestCase(new int[] { 4, 7, 8, 9 }, ExpectedResult = new int[] { 9, 8, 7, 4 })]
+        [TestCase(new int[] { -5, -17, -8, -9 }, ExpectedResult = new int[] { -5, -8, -9, -17 })]
+        [TestCase(new int[] { 5, 7, -88, 9 }, ExpectedResult = new int[] { 9, 7, 5, -88 })]
+        public IEnumerable<int> SortBy_SortByDescending_returnsSortedSequence(int[] array)
+        {
+            return Enumerable.SortByDescending<int, int>(array, x => x);
+        }
     }
 }
