@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using PseudoLINQ;
+using System.Numerics;
 
 namespace PseudoEnumerable
 {
@@ -72,7 +74,28 @@ namespace PseudoEnumerable
         {
             CheckForExceptions(source, key);
 
-            return SortBy(source, key, null);
+            return SortBy(source, key, Comparer<TKey>.Default);
+        }
+
+        /// <summary>
+        /// Sorts the elements of a sequence in ascending order according to a key.
+        /// </summary>
+        /// <typeparam name="TSource">The type of the elements of source.</typeparam>
+        /// <typeparam name="TKeyFirst">The type of the key returned by key.</typeparam>
+        /// <typeparam name="TKeySecond">The type of the key returned by key.</typeparam>
+        /// <param name="source">A sequence of values to order.</param>
+        /// <param name="key">A function to extract a key from an element.</param>
+        /// <returns>
+        ///     An <see cref="IEnumerable{TSource}"/> whose elements are sorted according to a key.
+        /// </returns>
+        /// <exception cref="ArgumentNullException">Throws if <paramref name="source"/> is null.</exception>
+        /// <exception cref="ArgumentNullException">Throws if <paramref name="key"/> is null.</exception>
+        public static IEnumerable<TSource> SortBy<TSource, TKeyFirst, TKeySecond>(this IEnumerable<TSource> source,
+           Func<TSource, TKeyFirst> key1, Func<TSource, TKeySecond> key2)
+        {
+            CheckForExceptions(source, key1);
+            CheckForExceptions(source, key2);
+            return SortBy(SortBy(source, key1, Comparer<TKeyFirst>.Default),key2, Comparer<TKeySecond>.Default);
         }
 
         /// <summary>
@@ -92,6 +115,11 @@ namespace PseudoEnumerable
         public static IEnumerable<TSource> SortBy<TSource, TKey>(this IEnumerable<TSource> source,
             Func<TSource, TKey> key, IComparer<TKey> comparer)
         {
+            if (comparer == null)
+            {
+                throw new ArgumentNullException($"{nameof(comparer)} can't be null");
+            }
+
             CheckForExceptions(source, key);
 
             List<TKey> keys = new List<TKey>();
@@ -101,20 +129,31 @@ namespace PseudoEnumerable
             }
 
             List<TSource> sources = new List<TSource>(source);
-            TKey[] arrayKeys = keys.ToArray();
             TSource[] arraySource = sources.ToArray();
 
-            if (comparer == null)
-            {
-                Array.Sort(arrayKeys, arraySource);
-            }
-            else
-            {
-                Array.Sort(arrayKeys, arraySource, comparer);
-            }
+            Array.Sort(keys.ToArray(), arraySource, comparer);
 
             return arraySource;
         }
+
+        /// <summary>
+        /// Sorts the elements of a sequence in descending order according by using a specified comparer for a key .
+        /// </summary>
+        /// <typeparam name="TSource">The type of the elements of source.</typeparam>
+        /// <typeparam name="TKey">The type of the key returned by key.</typeparam>
+        /// <param name="source">A sequence of values to order.</param>
+        /// <param name="key">A function to extract a key from an element.</param>
+        /// <returns>
+        ///     An <see cref="IEnumerable{TSource}"/> whose elements are sorted according to a key.
+        /// </returns>
+        /// <exception cref="ArgumentNullException">Throws if <paramref name="source"/> is null.</exception>
+        /// <exception cref="ArgumentNullException">Throws if <paramref name="key"/> is null.</exception>
+        //public static IEnumerable<TSource> SortByDescending<TSource, TKey>(this IEnumerable<TSource> source,
+        //    Func<TSource, TKey> key)
+        //{
+        //    CheckForExceptions(source, key);
+        //   // return SortBy<TSource,TKey>(source, key, new SortByDescending());
+        //}
 
         /// <summary>
         /// Casts the elements of an IEnumerable to the specified type.
@@ -171,8 +210,26 @@ namespace PseudoEnumerable
                     break;
                 }
             }
-
             return result;
+        }
+
+        /// <summary>
+        /// Prime Number Generator
+        /// </summary>
+        /// <param name="start">start number</param>
+        /// <param name="count">count of numbers</param>
+        /// <returns></returns>
+        static public IEnumerable<BigInteger> PrimeNumberGenerator(BigInteger start, BigInteger count)
+        {
+            if (count < 0)
+            {
+                throw new ArgumentNullException($"{nameof(count)} can't be less than zero");
+            }
+
+            for (BigInteger i = 0; i < count; i++)
+            {
+                yield return start++;
+            }
         }
 
         static private void CheckForExceptions<T1, T2>(IEnumerable<T1> source,

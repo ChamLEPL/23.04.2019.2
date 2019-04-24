@@ -84,8 +84,17 @@ namespace PseudoEnumerable.Tests
         [TestCase(new int[] { 5, 7, -88, 9 }, ExpectedResult = new int[] { -88, 5, 7, 9 })]
         public IEnumerable<int> SortBy_SortByEven_returnsSortedSequenceWithComparer(int[] array)
         {
-            return Enumerable.SortBy<int, bool>(array,  x => x % 2 == 0,
+            return Enumerable.SortBy(array,  x => x % 2 == 0,
                 new CompareByBoolFirstEven());
+        }
+
+        [TestCase(new int[] { 4, 7, 8, 9 }, ExpectedResult = new int[] { 4, 7, 8, 9 })]
+        [TestCase(new int[] { -5, -17, -8, -9 }, ExpectedResult = new int[] { -17, -5, -8, -9 })]
+        [TestCase(new int[] { 5, 7, -88, 9 }, ExpectedResult = new int[] { 5, 7, -88, 9 })]
+        public IEnumerable<int> SortBy_SortByEvenAndOdd_returnsSortedSequence(int[] array)
+        {
+            return Enumerable.SortBy<int, int, string>(array, x => Math.Abs(x), 
+                 x => (-x).ToString());
         }
     }
 }
