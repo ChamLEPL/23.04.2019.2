@@ -54,11 +54,15 @@ namespace PseudoEnumerable.Tests
             }
         }
 
+        [TestCase(new object[] { 12, "Hi" })]
+        [TestCase(new object[] { "Hi", 12 })]
+        [TestCase(new object[] { "Roma", "Bortnik", "Kucherenko", "Loves each other", 25 })]
+        public void Check(object[] source)
+        {
+            Assert.Throws<InvalidCastException>(() => CastTo_HasIntAndStringValues_ThrowInvalidCastException(source));
+        }
 
-        [TestCase(new object[] { 12, "Hi"})]
-        [TestCase(new object[] { "Hi", 12})]
-        [TestCase(new object[] { "Roma", "Bortnik", "Kucherenko", "Loves each other", 69 })]
-        public void CastTo_HasIntAndStringValues_ThrowInvalidCastException(object[] source)
+        private void CastTo_HasIntAndStringValues_ThrowInvalidCastException(object[] source)
         {
             using (var iterator = Enumerable.CastTo<string>(source).GetEnumerator())
             {
@@ -68,7 +72,7 @@ namespace PseudoEnumerable.Tests
                 }
                 catch(InvalidCastException)
                 {
-                    Assert.Throws<InvalidCastException>(() => { throw new InvalidCastException(); });
+                    throw new InvalidCastException();
                 }
             }
         }
