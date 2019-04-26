@@ -54,12 +54,22 @@ namespace PseudoEnumerable.Tests
             }
         }
 
-        [TestCase(new object[] { 12, "hi" })]
+
+        [TestCase(new object[] { 12, "Hi"})]
+        [TestCase(new object[] { "Hi", 12})]
+        [TestCase(new object[] { "Roma", "Bortnik", "Kucherenko", "Loves each other", 69 })]
         public void CastTo_HasIntAndStringValues_ThrowInvalidCastException(object[] source)
         {
             using (var iterator = Enumerable.CastTo<string>(source).GetEnumerator())
             {
-                Assert.Throws<InvalidCastException>(() => iterator.MoveNext());
+                try
+                {
+                    while (iterator.MoveNext()) { };
+                }
+                catch(InvalidCastException)
+                {
+                    Assert.Throws<InvalidCastException>(() => { throw new InvalidCastException(); });
+                }
             }
         }
 
@@ -103,6 +113,11 @@ namespace PseudoEnumerable.Tests
         public IEnumerable<int> SortBy_SortByDescending_returnsSortedSequence(int[] array)
         {
             return Enumerable.SortByDescending<int, int>(array, x => x);
+        }
+
+        public void MethodAccessExcept(IEnumerator<object> enumer)
+        {
+            enumer.MoveNext();
         }
     }
 }
